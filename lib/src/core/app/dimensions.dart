@@ -36,5 +36,9 @@ double appWidth(BuildContext context) => MediaQuery.of(context).size.width;
 
 //! padding
 const screenPadding = EdgeInsets.all(8);
-const screenLeftRightPadding = EdgeInsets.symmetric(horizontal: 8);
+const screenLeftRightPadding = EdgeInsets.symmetric(horizontal: 16);
 const screenTopBottomPadding = EdgeInsets.symmetric(vertical: 16);
+
+hideKeyboard() {
+  FocusManager.instance.primaryFocus?.unfocus();
+}

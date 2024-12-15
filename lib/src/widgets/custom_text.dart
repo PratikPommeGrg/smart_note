@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smart_note/src/core/app/texts.dart';
 
 import '../core/app/colors.dart';
-
 
 class CustomText {
   static Text ourText(
@@ -27,10 +27,10 @@ class CustomText {
           decoration: textDecoration ?? TextDecoration.none,
           decorationColor: decorationColor ?? AppColor.kNeutral800,
           fontSize: fontSize,
-          // fontFamily: isFontFamily == true ? appFont : null,
+          fontFamily: isFontFamily == true ? fontFamily : null,
           fontStyle: fontStyle ?? FontStyle.normal,
           fontWeight: fontWeight ?? FontWeight.normal,
-          color: color ?? AppColor.kNeutral900,
+          color: color ?? AppColor.kNeutral800,
         ),
       );
 }

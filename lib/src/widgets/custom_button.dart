@@ -73,11 +73,11 @@ class CustomButton {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           elevation: elevation ?? 0.0,
-          foregroundColor: color ?? AppColor.kBlueMain,
+          foregroundColor: color ?? AppColor.kNeutral800,
           padding: padding ??
               const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           backgroundColor:
-              isBorder ? Colors.transparent : color ?? AppColor.kBlueMain,
+              isBorder ? Colors.transparent : color ?? AppColor.secondaryColor,
           disabledBackgroundColor:
               disabledBackgroundColor ?? AppColor.kNeutral300,
           disabledForegroundColor: AppColor.kNeutral200,
@@ -90,7 +90,7 @@ class CustomButton {
                     width: 2,
                   )
                 : BorderSide.none,
-            // borderRadius: BorderRadius.circular(borderRadius),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         onPressed: isDisable ? null : onPressed,

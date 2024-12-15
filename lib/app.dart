@@ -11,6 +11,7 @@ class SmartNoteApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       navigatorKey: rootNavigatorKey,
       home: const HomeScreen(),
       onGenerateRoute: RouteGenerator.generateRoute,

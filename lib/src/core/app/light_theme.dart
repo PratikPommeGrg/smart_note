@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_note/src/core/app/colors.dart';
+import 'package:smart_note/src/core/app/texts.dart';
 
 final appTheme = ThemeData(
-  scaffoldBackgroundColor: AppColor.backgroundColor,
-  primaryColor: AppColor.primaryColor,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: AppColor.backgroundColor,
-    systemOverlayStyle: SystemUiOverlayStyle(
-      statusBarColor: AppColor.backgroundColor,
+    fontFamily: fontFamily,
+    scaffoldBackgroundColor: AppColor.kNeutral100,
+    primaryColor: AppColor.primaryColor,
+    appBarTheme: AppBarTheme(
+      foregroundColor: AppColor.kNeutral800,
+      backgroundColor: AppColor.primaryColor,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+          // statusBarColor: AppColor.backgroundColor,
+          // statusBarBrightness: Brightness.dark,
+          ),
     ),
-  ),
-);
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: AppColor.tertiaryColor,
+    ));

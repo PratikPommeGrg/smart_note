@@ -8,6 +8,7 @@ ValueNotifier<bool> isFABOpened = ValueNotifier<bool>(false);
 ValueNotifier<bool> isScreenBlurred = ValueNotifier<bool>(false);
 
 List<String> noteCategories = [
+  "All",
   "Personal",
   "Work",
   "Grocery",
@@ -15,3 +16,7 @@ List<String> noteCategories = [
   "Health",
   "Ideas"
 ];
+
+
+ final TextEditingController titleController = TextEditingController();
+    final TextEditingController noteController = TextEditingController();

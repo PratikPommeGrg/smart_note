@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_note/src/core/configs/route_config.dart';
 import 'package:smart_note/src/features/home/view/home_screen.dart';
+import 'package:smart_note/src/features/note/view/add_note_screen.dart';
 import 'package:smart_note/src/features/voice_record/view/voice_record_screen.dart';
 
 class RouteGenerator {
@@ -11,6 +12,9 @@ class RouteGenerator {
 
       case RouteConfig.voiceRecordScreen:
         return MaterialPageRoute(builder: (_) => const VoiceRecordScreen());
+
+      case RouteConfig.addNoteScreen:
+        return MaterialPageRoute(builder: (_) => const AddNoteScreen());
 
       default:
         return MaterialPageRoute(builder: (_) => const RouteErrorScreen());
