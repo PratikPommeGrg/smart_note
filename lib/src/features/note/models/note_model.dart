@@ -3,14 +3,14 @@ class NoteModel {
   final String title;
   final String note;
   final String category;
-  final List<String>? attachedImages;
+  final List<String>? images;
 
   const NoteModel({
     this.id,
     required this.title,
     required this.note,
     required this.category,
-    this.attachedImages,
+    this.images,
   });
 
   NoteModel.fromMap(Map<String, dynamic> map)
@@ -18,8 +18,8 @@ class NoteModel {
         title = map['title'],
         note = map['note'],
         category = map['category'],
-        attachedImages = map['attachedImages'] != null
-            ? List.from(map['attachedImages'].split('--,--'))
+        images = map['images'] != null
+            ? List.from(map['images'].split('--,--'))
             : null;
 
   Map<String, dynamic> toMap() {
@@ -29,8 +29,8 @@ class NoteModel {
       'category': category,
     };
 
-    if (attachedImages != null) {
-      map['attachedImages'] = attachedImages!.join('--,--');
+    if (images != null) {
+      map['images'] = images!.join('--,--');
     }
 
     return map;
@@ -38,6 +38,6 @@ class NoteModel {
 
   @override
   String toString() {
-    return 'NoteModel{id: $id, title: $title, note: $note, category: $category, attachedImages: $attachedImages}';
+    return 'NoteModel{id: $id, title: $title, note: $note, category: $category, images: $images}';
   }
 }

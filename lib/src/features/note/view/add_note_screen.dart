@@ -6,27 +6,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:smart_note/src/core/app/colors.dart';
 import 'package:smart_note/src/core/app/dimensions.dart';
+import 'package:smart_note/src/core/app/texts.dart';
+import 'package:smart_note/src/core/enums/enums.dart';
 import 'package:smart_note/src/core/routing/route_navigation.dart';
-import 'package:smart_note/src/features/note/models/note_model.dart';
 import 'package:smart_note/src/features/note/models/note_options_model.dart';
 import 'package:smart_note/src/providers/image_provider/image_provider.dart';
 import 'package:smart_note/src/providers/image_to_text_provider/image_to_text_provider.dart';
-import 'package:smart_note/src/services/local_storage_service.dart';
+import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
 import 'package:smart_note/src/widgets/custom_dialogs.dart';
+import 'package:smart_note/src/widgets/custom_snackbar.dart';
 import 'package:smart_note/src/widgets/custom_text.dart';
 import 'package:smart_note/src/widgets/custom_text_form_field_widget.dart';
-
-import '../../../core/states/states.dart';
 
 class AddNoteScreen extends ConsumerWidget {
   const AddNoteScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final attachedImagesProvider = ref.watch(attachedImageProvider);
-    // final scannedImageProvider = ref.watch(scanImageProvider);
-    // final imageToTextState = ref.watch(imageToTextProvider);
-    final localStorageService = ref.watch(localStorageServiceProvider);
+    final attachedImagesProviderService = ref.watch(attachedImageProvider);
+    bool isSaving = false;
 
     ref.listen(imageToTextProvider, (previous, next) {
       if (next.status == ImageToTextStateStatus.loading) {
@@ -34,20 +32,37 @@ class AddNoteScreen extends ConsumerWidget {
       }
       if (next.status == ImageToTextStateStatus.failure) {
         back(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Processing Image Failed'),
-            backgroundColor: AppColor.kRedMain,
-          ),
-        );
+        CustomSnackbar.showSnackBar(
+            context: context,
+            message: "Failed to process image",
+            isSuccess: false);
       }
       if (next.status == ImageToTextStateStatus.success) {
         back(context);
         CustomDialogs.showExtractedTextDialog(
           context: context,
           extractedText: next.extractedText,
-          textEditingController: noteController,
+          textEditingController:
+              ref.read(notesProvider.notifier).noteController,
         );
+      }
+    });
+
+    ref.listen(notesProvider, (previous, next) {
+      if (next.status == NotesStateStatus.addNoteLoading) {
+        CustomDialogs.fullLoadingDialog(context: context, data: next.message);
+      }
+      if (next.status == NotesStateStatus.addNoteFailure) {
+        back(context);
+        CustomSnackbar.showSnackBar(
+            context: context, message: next.message ?? '', isSuccess: false);
+      }
+      if (next.status == NotesStateStatus.addNoteSuccess) {
+        ref.read(notesProvider.notifier).getNotes();
+        back(context);
+        back(context);
+        CustomSnackbar.showSnackBar(
+            context: context, message: next.message ?? '');
       }
     });
 
@@ -58,13 +73,26 @@ class AddNoteScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 16),
             child: InkWell(
               onTap: () async {
-                localStorageService.insertToTable(
-                  NoteModel(
-                    title: "test",
-                    note: "test note",
-                    category: noteCategories[3],
-                  ),
-                );
+                if (isSaving == true) return;
+                isSaving = true;
+                hideKeyboard();
+                await Future.delayed(const Duration(milliseconds: 700));
+                if (ref
+                    .read(notesProvider.notifier)
+                    .noteFormKey
+                    .currentState!
+                    .validate()) {
+                  if (ref.read(selectNoteCategoryProvider) == null) {
+                    CustomSnackbar.showSnackBar(
+                      context: context,
+                      message: "Please select a category!",
+                      warningSnackBar: true,
+                    );
+                  } else {
+                    await ref.read(notesProvider.notifier).addNote();
+                  }
+                  isSaving = false;
+                }
               },
               child: Container(
                 padding:
@@ -90,120 +118,174 @@ class AddNoteScreen extends ConsumerWidget {
           onPopInvokedWithResult: (didPop, result) {
             if (didPop) {
               ref.read(imagePickerProvider).resetImage(ref);
-              noteController.clear();
-              titleController.clear();
+              ref.read(notesProvider.notifier).reset();
+              ref
+                  .read(selectNoteCategoryProvider.notifier)
+                  .update((state) => null);
             }
           },
           child: SingleChildScrollView(
             child: Padding(
               padding: screenLeftRightPadding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  vSizedBox1andHalf,
-                  CustomText.ourText(
-                    "Title:",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  vSizedBox0andHalf,
-                  CustomTextFormField(
-                    controller: titleController,
-                  ),
-                  vSizedBox1andHalf,
-                  CustomText.ourText(
-                    "Write Note:",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  vSizedBox0andHalf,
-                  CustomTextFormField(
-                    minLine: 15,
-                    maxLine: 15,
-                    textInputType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                    controller: noteController,
-                  ),
-                  vSizedBox1andHalf,
-                  if (attachedImagesProvider.isNotEmpty) ...[
-                    Row(
-                      children: [
-                        Transform.rotate(
-                            angle: pi / -3,
-                            child: const Icon(Icons.attachment_rounded)),
-                        CustomText.ourText(
-                          "Attached Images:",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ],
+              child: Form(
+                key: ref.read(notesProvider.notifier).noteFormKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    vSizedBox1andHalf,
+                    CustomText.ourText(
+                      "Category:",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                     vSizedBox0andHalf,
-                    GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: attachedImagesProvider.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
+                    DropdownButton(
+                      value: ref.watch(selectNoteCategoryProvider),
+                      hint: CustomText.ourText(
+                        "Select Category",
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.kNeutral400,
                       ),
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            CustomDialogs.showImageDialog(
-                              context: context,
-                              imageUrl: attachedImagesProvider[index].path,
-                              isLocal: true,
-                            );
-                          },
-                          child: Container(
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            height: 80,
-                            child: Stack(
-                              children: [
-                                SizedBox(
-                                  height: appHeight(context),
-                                  width: appWidth(context),
-                                  child: Image.file(
-                                    File(attachedImagesProvider[index].path),
-                                    fit: BoxFit.cover,
-                                  ),
+                      isExpanded: true,
+                      enableFeedback: true,
+                      dropdownColor: AppColor.kWhite,
+                      items: NoteCategoryEnum.values
+                          .map((e) => DropdownMenuItem(
+                                value: e,
+                                child: CustomText.ourText(
+                                  e.name,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.kNeutral800,
                                 ),
-                                Positioned(
-                                  top: 12,
-                                  right: 12,
-                                  child: InkWell(
-                                    onTap: () {
-                                      ref
-                                          .read(imagePickerProvider)
-                                          .removeImage(index, ref);
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: AppColor.kWhite,
-                                      ),
-                                      child: Icon(
-                                        Icons.close,
-                                        color: AppColor.kNeutral800,
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          ref
+                              .read(selectNoteCategoryProvider.notifier)
+                              .update((state) => value);
+                        }
+                      },
+                    ),
+                    vSizedBox1andHalf,
+                    CustomText.ourText(
+                      "Title:",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    vSizedBox0andHalf,
+                    CustomTextFormField(
+                      controller:
+                          ref.read(notesProvider.notifier).titleController,
+                      validator: (value) {
+                        if (value.toString().isEmpty) {
+                          return emptyTextFormField;
+                        }
+                      },
+                    ),
+                    vSizedBox1andHalf,
+                    CustomText.ourText(
+                      "Write Note:",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    vSizedBox0andHalf,
+                    CustomTextFormField(
+                      minLine: 15,
+                      maxLine: 15,
+                      textInputType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      controller:
+                          ref.read(notesProvider.notifier).noteController,
+                      validator: (value) {
+                        if (value.toString().isEmpty) {
+                          return emptyTextFormField;
+                        }
+                      },
+                    ),
+                    vSizedBox1andHalf,
+                    if (attachedImagesProviderService.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          Transform.rotate(
+                              angle: pi / -3,
+                              child: const Icon(Icons.attachment_rounded)),
+                          CustomText.ourText(
+                            "Attached Images:",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
+                      ),
+                      vSizedBox0andHalf,
+                      GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: attachedImagesProviderService.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              CustomDialogs.showImageDialog(
+                                context: context,
+                                imageUrl:
+                                    attachedImagesProviderService[index].path,
+                                isLocal: true,
+                              );
+                            },
+                            child: Container(
+                              clipBehavior: Clip.hardEdge,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              height: 80,
+                              child: Stack(
+                                children: [
+                                  SizedBox(
+                                    height: appHeight(context),
+                                    width: appWidth(context),
+                                    child: Image.file(
+                                      File(attachedImagesProviderService[index]
+                                          .path),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 12,
+                                    right: 12,
+                                    child: InkWell(
+                                      onTap: () {
+                                        ref
+                                            .read(imagePickerProvider)
+                                            .removeImage(index, ref);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColor.kWhite,
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          color: AppColor.kNeutral800,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
+                    ],
+                    vSizedBox1andHalf,
                   ],
-                  vSizedBox1andHalf,
-                ],
+                ),
               ),
             ),
           ),

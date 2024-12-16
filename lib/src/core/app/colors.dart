@@ -28,4 +28,12 @@ class AppColor {
   static Color kNeutral100 = const Color(0xffF1F5F9);
   static Color kNeutral50 = const Color(0xffF8FAFC);
   static Color kWhite = const Color(0xFFFFFFFF);
+
+  //category color
+  static Color kPersonalColor = const Color(0xFFFF6F61);
+  static Color kWorkColor = const Color(0xFF264653);
+  static Color kGroceryColor = const Color(0xFF2A9D8F);
+  static Color kTravelColor = const Color(0xFF00A8E8);
+  static Color kHealthColor = const Color(0xFFA8DADC);
+  static Color kIdeasColor = const Color(0xFFFFCC00);
 }

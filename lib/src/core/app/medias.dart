@@ -14,6 +14,7 @@ const baseJsonPath = 'assets/json/';
 final kAttachSvg = _getSvgBasePath('attach.svg');
 final kGallerySvg = _getSvgBasePath('gallery.svg');
 final kMicSvg = _getSvgBasePath('mic.svg');
+final kAddNoteSvg = _getSvgBasePath('add_note.svg');
 
 //jsons
 final kVoiceRecordActiveJson = _getJsonBasePath('voice_record_active.json');

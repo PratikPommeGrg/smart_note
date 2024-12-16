@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_note/src/features/note/models/note_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-
-
 class LocalStorageService {
   final _databaseName = "smartNote.db";
   final _databaseVersion = 1;
@@ -28,7 +26,8 @@ class LocalStorageService {
 
   _initDatabase() async {
     String databasePath = await getDatabasesPath();
-    String fullPath = '$databasePath$_databaseName';
+    String fullPath = '$databasePath/$_databaseName';
+    print("full path :: $fullPath");
     return await openDatabase(
       fullPath,
       version: _databaseVersion,
@@ -50,6 +49,7 @@ $imagesPath TEXT
     await openMyDatabase;
     final List<Map<String, Object?>> result =
         await _database!.rawQuery('Select * from $tableName');
+    print("resutl all notest :: $result");
     return result.map((e) => NoteModel.fromMap(e)).toList();
   }
 
@@ -74,7 +74,15 @@ $imagesPath TEXT
           where: "$columnId = ?",
           whereArgs: [id],
         ));
-    _database?.close();
+    // _database?.close();
+  }
+
+  Future<List<NoteModel>?> getNotesByCategory(String category) async {
+    print("category in service :: $category");
+    await openMyDatabase;
+    final List<Map<String, Object?>> result = await _database!
+        .query(tableName, where: '$columnCategory = ?', whereArgs: [category]);
+    return result.map((e) => NoteModel.fromMap(e)).toList();
   }
 }
 
