@@ -14,11 +14,15 @@ import 'package:smart_note/src/core/routing/route_navigation.dart';
 import 'package:smart_note/src/core/states/states.dart';
 import 'package:smart_note/src/features/note/models/note_model.dart';
 import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
+import 'package:smart_note/src/services/local_storage_service.dart';
 import 'package:smart_note/src/widgets/custom_network_image_widget.dart';
 import 'package:smart_note/src/widgets/custom_snackbar.dart';
 
 import '../../../core/app/colors.dart';
 import '../../../widgets/custom_text.dart';
+
+part 'widgets/categories_list.dart';
+part 'widgets/note_card.dart';
 
 const String ppLink =
     "https://i.pinimg.com/236x/13/15/50/13155027fb68a268abe90b4b04d52aa5.jpg";
@@ -30,7 +34,23 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.detached ||
+        state == AppLifecycleState.inactive) {
+      ref.read(localStorageServiceProvider).closeDatabase();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -52,9 +72,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               context: context, message: next.message ?? '', isSuccess: false);
         }
         if (next.status == NotesStateStatus.deleteSuccess) {
-          ref
-              .read(notesProvider.notifier)
-              .getNotes(showLoadingIndicator: false);
+          ref.read(notesProvider.notifier).getNotes(
+                showLoadingIndicator: false,
+                getByCategory: selectedCategory.value != "All",
+              );
           CustomSnackbar.showSnackBar(
               context: context, message: next.message ?? '');
         }
@@ -102,53 +123,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         decoration: BoxDecoration(
             border: Border(
                 top: BorderSide(
-          color: AppColor.kNeutral200,
+          color: AppColor.kNeutral300,
         ))),
         child: Padding(
           padding: screenLeftRightPadding,
           child: Column(
             children: [
-              vSizedBox1,
-              SizedBox(
-                height: 40,
-                child: ValueListenableBuilder(
-                  valueListenable: selectedCategory,
-                  builder: (context, value, child) => ListView.separated(
-                    clipBehavior: Clip.none,
-                    scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) => hSizedBox0andHalf,
-                    itemCount: noteCategories.length,
-                    itemBuilder: (context, index) {
-                      bool isSelected = value == noteCategories[index];
-                      return InkWell(
-                        onTap: () {
-                          selectedCategory.value = noteCategories[index];
-                          ref.read(notesProvider.notifier).getNotes(
-                                getByCategory: noteCategories[index] !=
-                                    "All",
-                              );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColor.secondaryColor
-                                : AppColor.tertiaryColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: CustomText.ourText(
-                            noteCategories[index],
-                            color: isSelected ? AppColor.kWhite : null,
-                            fontWeight: isSelected ? FontWeight.w600 : null,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              vSizedBox1,
+              vSizedBox1andHalf,
+              CategoriesList(noteCategories: noteCategories, ref: ref),
+              vSizedBox1andHalf,
               SearchBar(
                 constraints: BoxConstraints(
                   minWidth: appWidth(context),
@@ -188,7 +171,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
-              vSizedBox1,
+              vSizedBox1andHalf,
               Expanded(
                 child: allNotes.status == NotesStateStatus.loading &&
                         allNotes.showLoadingIndicator == true
@@ -215,11 +198,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     children: [
                                       SvgPicture.asset(
                                         kAddNoteSvg,
-                                        height: 260,
-                                        width: 260,
+                                        height: 200,
+                                        width: 200,
                                       ),
                                       CustomText.ourText(
-                                        "Haven't added any notes yet,\n let's add one",
+                                        "No Notes Found",
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
                                         color: AppColor.kNeutral500,
@@ -232,14 +215,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             : SingleChildScrollView(
                                 child: StaggeredGrid.count(
                                   crossAxisCount: 2,
-                                  mainAxisSpacing: 4.0,
-                                  crossAxisSpacing: 4.0,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 8,
                                   children: List.generate(
                                     allNotes.notes.length,
                                     (index) => StaggeredGridTile.count(
                                       crossAxisCellCount: 1,
                                       mainAxisCellCount:
-                                          generateMaxAxisCellCount(),
+                                          allNotes.notes[index].cardSize ?? 1,
                                       child: InkWell(
                                         splashColor: Colors.transparent,
                                         borderRadius: BorderRadius.circular(12),
@@ -250,10 +233,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             allNotes.notes[index].id ?? 0,
                                           );
                                         },
-                                        child: BackGroundTile(
-                                          backgroundColor: getCardColor(
-                                              allNotes.notes[index].category),
+                                        child: noteCard(
                                           note: allNotes.notes[index],
+                                          ref: ref,
+                                          context: context,
                                         ),
                                       ),
                                     ),
@@ -276,12 +259,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Icon(
               CupertinoIcons.add,
-              color: AppColor.kNeutral800,
+              color: AppColor.kWhite,
             ),
             hSizedBox0andHalf,
             CustomText.ourText(
               "New Note",
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
+              color: AppColor.kWhite,
             ),
           ],
         ),
@@ -289,59 +273,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
-}
-
-class BackGroundTile extends StatelessWidget {
-  final Color backgroundColor;
-  final NoteModel? note;
-
-  const BackGroundTile({super.key, required this.backgroundColor, this.note});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 8,
-      shadowColor: backgroundColor.withAlpha(160),
-      color: backgroundColor,
-      child: Padding(
-        padding: screenPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 8,
-          children: [
-            CustomText.ourText(
-              note?.title.toUpperCase() ?? '',
-              fontWeight: FontWeight.w600,
-              color: AppColor.kNeutral800,
-            ),
-            CustomText.ourText(note?.note ?? ''),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-Color getCardColor(String category) {
-  return category == "Personal"
-      ? AppColor.kPersonalColor
-      : category == "Work"
-          ? AppColor.kWorkColor
-          : category == "Grocery"
-              ? AppColor.kGroceryColor
-              : category == "Travel"
-                  ? AppColor.kTravelColor
-                  : category == "Health"
-                      ? AppColor.kHealthColor
-                      : category == "Ideas"
-                          ? AppColor.kIdeasColor
-                          : AppColor.kNeutral100;
-}
-
-num generateMaxAxisCellCount() {
-  final Random random = Random();
-  List<num> choices = [0.8, 1.0, 1.3];
-  return choices[random.nextInt(choices.length)];
 }
 
 void _showNoteOptions(
@@ -355,32 +286,42 @@ void _showNoteOptions(
       borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
     ),
     builder: (_) {
-      return Wrap(
-        children: [
-          ListTile(
-            leading: const Icon(CupertinoIcons.pencil),
-            title: const Text("Edit Note"),
-            onTap: () {
-              back(context);
-              // Navigate to edit screen or show edit dialog
-              // navigateNamed(
-              //   context,
-              //   RouteConfig.editNoteScreen,
-              //   arguments: {
-              //     'noteIndex': noteIndex,
-              //   },
-              // );
-            },
-          ),
-          ListTile(
-            leading: const Icon(CupertinoIcons.trash),
-            title: const Text("Delete Note"),
-            onTap: () {
-              back(context);
-              ref.read(notesProvider.notifier).deleteNote(noteId);
-            },
-          ),
-        ],
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(CupertinoIcons.pencil),
+              title: CustomText.ourText(
+                "Edit Note",
+                fontWeight: FontWeight.w500,
+              ),
+              onTap: () {
+                back(context);
+                // Navigate to edit screen or show edit dialog
+                // navigateNamed(
+                //   context,
+                //   RouteConfig.editNoteScreen,
+                //   arguments: {
+                //     'noteIndex': noteIndex,
+                //   },
+                // );
+              },
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.trash),
+              title: CustomText.ourText(
+                "Delete Note",
+                fontWeight: FontWeight.w500,
+              ),
+              onTap: () {
+                back(context);
+                ref.read(notesProvider.notifier).deleteNote(noteId);
+              },
+            ),
+          ],
+        ),
       );
     },
   );

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:smart_note/src/core/configs/route_config.dart';
 import 'package:smart_note/src/features/home/view/home_screen.dart';
 import 'package:smart_note/src/features/note/view/add_note_screen.dart';
+import 'package:smart_note/src/features/splash/view/splash_screen.dart';
 import 'package:smart_note/src/features/voice_record/view/voice_record_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case RouteConfig.splashScreen:
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
+
       case RouteConfig.homeScreen:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 

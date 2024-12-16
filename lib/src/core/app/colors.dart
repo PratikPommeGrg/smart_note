@@ -2,8 +2,10 @@ import 'dart:ui';
 
 class AppColor {
   static const backgroundColor = Color(0xFFFCFCFC);
-  static const primaryColor = Color(0xFFA67B5B);
-  static const secondaryColor = Color(0xFF879676);
+  // static const primaryColor = Color(0xFFA67B5B);
+  static const primaryColor = Color(0xFFC7D9E5);
+  static const secondaryColor = Color(0xFF2E4157);
+  // static const secondaryColor = Color(0xFF879676);
   static const tertiaryColor = Color(0xFFD3BDB0);
   static const optionalColor = Color(0xFFF9C0AB);
 
@@ -30,10 +32,10 @@ class AppColor {
   static Color kWhite = const Color(0xFFFFFFFF);
 
   //category color
-  static Color kPersonalColor = const Color(0xFFFF6F61);
-  static Color kWorkColor = const Color(0xFF264653);
-  static Color kGroceryColor = const Color(0xFF2A9D8F);
-  static Color kTravelColor = const Color(0xFF00A8E8);
-  static Color kHealthColor = const Color(0xFFA8DADC);
-  static Color kIdeasColor = const Color(0xFFFFCC00);
+  static Color kPersonalColor = const Color(0xFFA3CFF2);
+  static Color kWorkColor = const Color(0xFFA9F5EF);
+  static Color kGroceryColor = const Color(0xFFFFEADB);
+  static Color kTravelColor = const Color(0xFFF5A1AF);
+  static Color kHealthColor = const Color(0xFFA7F3EE);
+  static Color kIdeasColor = const Color(0xFFFFF9B0);
 }

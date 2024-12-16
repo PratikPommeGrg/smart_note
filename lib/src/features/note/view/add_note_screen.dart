@@ -98,7 +98,7 @@ class AddNoteScreen extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColor.kNeutral800,
+                  color: AppColor.secondaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomText.ourText(
@@ -295,7 +295,7 @@ class AddNoteScreen extends ConsumerWidget {
         color: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColor.primaryColor,
+            color: AppColor.secondaryColor,
             borderRadius: BorderRadius.circular(999),
           ),
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),

@@ -4,6 +4,7 @@ class NoteModel {
   final String note;
   final String category;
   final List<String>? images;
+  final double? cardSize;
 
   const NoteModel({
     this.id,
@@ -11,6 +12,7 @@ class NoteModel {
     required this.note,
     required this.category,
     this.images,
+    this.cardSize,
   });
 
   NoteModel.fromMap(Map<String, dynamic> map)
@@ -20,13 +22,15 @@ class NoteModel {
         category = map['category'],
         images = map['images'] != null
             ? List.from(map['images'].split('--,--'))
-            : null;
+            : null,
+        cardSize = map['cardSize'];
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'title': title,
       'note': note,
       'category': category,
+      'cardSize': cardSize
     };
 
     if (images != null) {
@@ -38,6 +42,6 @@ class NoteModel {
 
   @override
   String toString() {
-    return 'NoteModel{id: $id, title: $title, note: $note, category: $category, images: $images}';
+    return 'NoteModel{id: $id, title: $title, note: $note, category: $category, images: $images}, cardSize: $cardSize';
   }
 }

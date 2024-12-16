@@ -11,7 +11,8 @@ class LocalStorageService {
   final String columnTitle = "title";
   final String columnNote = "note";
   final String columnCategory = "category";
-  final String imagesPath = "images";
+  final String columnImagesPath = "images";
+  final String columnCardSize = "cardSize";
 
   LocalStorageService._();
   static final LocalStorageService instance = LocalStorageService._();
@@ -38,7 +39,8 @@ $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
 $columnTitle TEXT NOT NULL,
 $columnNote TEXT NOT NULL,
 $columnCategory TEXT NOT NULL,
-$imagesPath TEXT
+$columnImagesPath TEXT,
+$columnCardSize DOUBLE NOT NULL
 )
 ''');
       },
@@ -83,6 +85,14 @@ $imagesPath TEXT
     final List<Map<String, Object?>> result = await _database!
         .query(tableName, where: '$columnCategory = ?', whereArgs: [category]);
     return result.map((e) => NoteModel.fromMap(e)).toList();
+  }
+
+  Future<void> closeDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null; // Reset the reference to ensure no further usage.
+      print("Database closed successfully.");
+    }
   }
 }
 

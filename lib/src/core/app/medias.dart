@@ -8,13 +8,15 @@ const baseImagePath = 'assets/images/';
 const baseJsonPath = 'assets/json/';
 
 //images
-// final kenirmanLogoImage = _getImageBasePath('app_logo.png');
+final kAppIconImage = _getImageBasePath('app_icon.png');
+final kAppIcon2Image = _getImageBasePath('app_icon2.png');
 
 //svgs
 final kAttachSvg = _getSvgBasePath('attach.svg');
 final kGallerySvg = _getSvgBasePath('gallery.svg');
 final kMicSvg = _getSvgBasePath('mic.svg');
 final kAddNoteSvg = _getSvgBasePath('add_note.svg');
+final kPinSvg = _getSvgBasePath('pin.svg');
 
 //jsons
 final kVoiceRecordActiveJson = _getJsonBasePath('voice_record_active.json');

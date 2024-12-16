@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_note/src/core/enums/enums.dart';
 import 'package:smart_note/src/core/states/states.dart';
+import 'package:smart_note/src/features/home/view/home_screen.dart';
 import 'package:smart_note/src/features/note/models/note_model.dart';
 import 'package:smart_note/src/providers/image_provider/image_provider.dart';
 import 'package:smart_note/src/services/local_storage_service.dart';
@@ -118,7 +119,7 @@ class NotesProvider extends StateNotifier<NotesProvideState> {
         await Future.delayed(const Duration(milliseconds: 700));
       }
 
-      final List<NoteModel>? notes = getByCategory ?? false
+      final List<NoteModel>? notes = getByCategory == true
           ? await ref
               .read(localStorageServiceProvider)
               .getNotesByCategory(selectedCategory.value)
@@ -160,6 +161,7 @@ class NotesProvider extends StateNotifier<NotesProvideState> {
               images: attachedImages.isNotEmpty
                   ? attachedImages.map((e) => e.path).toList()
                   : null,
+              cardSize: generategenerateMaxAxisCellCount().toDouble(),
             ),
           );
       state = NotesProvideState.addNoteSuccess();
