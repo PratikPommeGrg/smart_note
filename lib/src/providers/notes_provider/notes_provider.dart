@@ -116,7 +116,7 @@ class NotesProvider extends StateNotifier<NotesProvideState> {
 
 //for testing loading case remove later
       if (showLoadingIndicator == true) {
-        await Future.delayed(const Duration(milliseconds: 700));
+        await Future.delayed(const Duration(milliseconds: 500));
       }
 
       final List<NoteModel>? notes = getByCategory == true

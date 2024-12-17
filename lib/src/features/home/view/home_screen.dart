@@ -25,7 +25,7 @@ part 'widgets/categories_list.dart';
 part 'widgets/note_card.dart';
 
 const String ppLink =
-    "https://i.pinimg.com/236x/13/15/50/13155027fb68a268abe90b4b04d52aa5.jpg";
+    "https://i.pinimg.com/736x/1f/8d/09/1f8d097025029c38e03e94036998b699.jpg";
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -132,51 +132,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               vSizedBox1andHalf,
               CategoriesList(noteCategories: noteCategories, ref: ref),
               vSizedBox1andHalf,
-              SearchBar(
-                constraints: BoxConstraints(
-                  minWidth: appWidth(context),
-                  minHeight: 52,
-                ),
-                elevation: const WidgetStatePropertyAll(0),
-                overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-                backgroundColor:
-                    const WidgetStatePropertyAll(Colors.transparent),
-                hintText: "Search Notes ...",
-                shape: WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: AppColor.kNeutral400,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                  ),
-                ),
-                hintStyle: WidgetStatePropertyAll(TextStyle(
-                  fontSize: 16,
-                  color: AppColor.kNeutral600,
-                  fontFamily: fontFamily,
-                )),
-                onTapOutside: (event) => hideKeyboard(),
-                trailing: [
-                  Icon(
-                    CupertinoIcons.search,
-                    color: AppColor.kNeutral500,
-                  ),
-                ],
-                padding: const WidgetStatePropertyAll(
-                  EdgeInsets.only(
-                    right: 16,
-                    left: 8,
-                  ),
-                ),
-              ),
-              vSizedBox1andHalf,
+              // SearchBar(
+              //   constraints: BoxConstraints(
+              //     minWidth: appWidth(context),
+              //     minHeight: 52,
+              //   ),
+              //   elevation: const WidgetStatePropertyAll(0),
+              //   overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+              //   backgroundColor:
+              //       const WidgetStatePropertyAll(Colors.transparent),
+              //   hintText: "Search Notes ...",
+              //   shape: WidgetStatePropertyAll(
+              //     RoundedRectangleBorder(
+              //       side: BorderSide(
+              //         color: AppColor.kNeutral400,
+              //       ),
+              //       borderRadius: const BorderRadius.all(
+              //         Radius.circular(12),
+              //       ),
+              //     ),
+              //   ),
+              //   hintStyle: WidgetStatePropertyAll(TextStyle(
+              //     fontSize: 16,
+              //     color: AppColor.kNeutral600,
+              //     fontFamily: fontFamily,
+              //   )),
+              //   onTapOutside: (event) => hideKeyboard(),
+              //   trailing: [
+              //     Icon(
+              //       CupertinoIcons.search,
+              //       color: AppColor.kNeutral500,
+              //     ),
+              //   ],
+              //   padding: const WidgetStatePropertyAll(
+              //     EdgeInsets.only(
+              //       right: 16,
+              //       left: 8,
+              //     ),
+              //   ),
+              // ),
+              // vSizedBox1andHalf,
               Expanded(
                 child: allNotes.status == NotesStateStatus.loading &&
                         allNotes.showLoadingIndicator == true
                     ? const Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator.adaptive(),
                       )
                     : allNotes.status == NotesStateStatus.failure
                         ? Center(
@@ -186,8 +186,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           )
                         : allNotes.notes.isEmpty &&
                                 allNotes.status == NotesStateStatus.success
-                            ? Center(
+                            ? Expanded(
                                 child: InkWell(
+                                  splashColor: AppColor.kNeutral100,
                                   onTap: () {
                                     navigateNamed(
                                         context, RouteConfig.addNoteScreen);
@@ -196,6 +197,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     spacing: 22,
                                     children: [
+                                      SizedBox(
+                                        height: 2,
+                                        width: appWidth(context),
+                                      ),
                                       SvgPicture.asset(
                                         kAddNoteSvg,
                                         height: 200,
@@ -224,7 +229,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       mainAxisCellCount:
                                           allNotes.notes[index].cardSize ?? 1,
                                       child: InkWell(
-                                        splashColor: Colors.transparent,
                                         borderRadius: BorderRadius.circular(12),
                                         onLongPress: () {
                                           _showNoteOptions(
@@ -281,6 +285,7 @@ void _showNoteOptions(
   int noteId,
 ) {
   showModalBottomSheet(
+    backgroundColor: AppColor.kNeutral50,
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(12)),

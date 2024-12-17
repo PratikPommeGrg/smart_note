@@ -54,16 +54,17 @@ Widget noteCard(
             decoration: BoxDecoration(
               color: noteCardColor(note.category),
               border: Border.all(
-                color: AppColor.secondaryColor,
-                width: 1,
+                color: AppColor.secondaryColor.withValues(alpha: 0.25),
+                width: 1.25,
               ),
+              backgroundBlendMode: BlendMode.modulate,
             ),
           ),
         ),
       ),
       Positioned(
-        right: -5,
-        top: -9,
+        right: -0,
+        top: -7,
         child: InkWell(
           onTap: () {
             _showNoteOptions(
@@ -74,10 +75,10 @@ Widget noteCard(
           },
           child: SvgPicture.asset(
             kPinSvg,
-            height: 18,
-            width: 18,
-            colorFilter: ColorFilter.mode(
-              AppColor.kNeutral600,
+            height: 20,
+            width: 20,
+            colorFilter: const ColorFilter.mode(
+              Colors.redAccent,
               BlendMode.srcIn,
             ),
           ),
