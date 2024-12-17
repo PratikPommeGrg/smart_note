@@ -14,7 +14,9 @@ import 'package:smart_note/src/core/routing/route_navigation.dart';
 import 'package:smart_note/src/core/states/states.dart';
 import 'package:smart_note/src/features/note/models/note_model.dart';
 import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
+import 'package:smart_note/src/providers/notes_provider/single_note_provider.dart';
 import 'package:smart_note/src/services/local_storage_service.dart';
+import 'package:smart_note/src/widgets/custom_dialogs.dart';
 import 'package:smart_note/src/widgets/custom_network_image_widget.dart';
 import 'package:smart_note/src/widgets/custom_snackbar.dart';
 
@@ -78,6 +80,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               );
           CustomSnackbar.showSnackBar(
               context: context, message: next.message ?? '');
+        }
+      },
+    );
+
+    ref.listen(
+      singleNoteProvider,
+      (previous, next) {
+        if (next.status == SingleNoteProviderStatus.loading) {
+          CustomDialogs.fullLoadingDialog(context: context);
+        }
+        if (next.status == SingleNoteProviderStatus.failure) {
+          back(context);
+          CustomSnackbar.showSnackBar(
+              context: context, message: next.message.toString());
+        }
+        if (next.status == SingleNoteProviderStatus.success) {
+          back(context);
+          ref.read(notesProvider.notifier).titleController.text =
+              next.note?.title ?? '';
+          ref.read(notesProvider.notifier).noteController.text =
+              next.note?.note ?? '';
+          ref.read(selectNoteCategoryProvider.notifier).update(
+                (state) => NoteCategoryEnum.values.firstWhere(
+                  (element) => element.name == next.note?.category,
+                ),
+              );
+          navigateNamed(
+            context,
+            RouteConfig.addNoteScreen,
+            arguments: {
+              "isForEdit": true,
+            },
+          );
         }
       },
     );
@@ -186,35 +221,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           )
                         : allNotes.notes.isEmpty &&
                                 allNotes.status == NotesStateStatus.success
-                            ? Expanded(
-                                child: InkWell(
-                                  splashColor: AppColor.kNeutral100,
-                                  onTap: () {
-                                    navigateNamed(
-                                        context, RouteConfig.addNoteScreen);
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    spacing: 22,
-                                    children: [
-                                      SizedBox(
-                                        height: 2,
-                                        width: appWidth(context),
-                                      ),
-                                      SvgPicture.asset(
-                                        kAddNoteSvg,
-                                        height: 200,
-                                        width: 200,
-                                      ),
-                                      CustomText.ourText(
-                                        "No Notes Found",
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColor.kNeutral500,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
+                            ? InkWell(
+                                splashColor: AppColor.kBlueLighter,
+                                overlayColor: WidgetStatePropertyAll(
+                                    AppColor.kNeutral200),
+                                onTap: () {
+                                  navigateNamed(
+                                      context, RouteConfig.addNoteScreen);
+                                },
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  spacing: 22,
+                                  children: [
+                                    SizedBox(
+                                      height: 2,
+                                      width: appWidth(context),
+                                    ),
+                                    SvgPicture.asset(
+                                      kAddNoteSvg,
+                                      height: 200,
+                                      width: 200,
+                                    ),
+                                    CustomText.ourText(
+                                      "No Notes Found",
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColor.kNeutral500,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
                               )
                             : SingleChildScrollView(
@@ -229,7 +264,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       mainAxisCellCount:
                                           allNotes.notes[index].cardSize ?? 1,
                                       child: InkWell(
-                                        borderRadius: BorderRadius.circular(12),
+                                        onTap: () async {
+                                          await ref
+                                              .read(singleNoteProvider.notifier)
+                                              .getSingleNote(
+                                                  noteId: allNotes
+                                                          .notes[index].id ??
+                                                      0);
+                                        },
                                         onLongPress: () {
                                           _showNoteOptions(
                                             context,

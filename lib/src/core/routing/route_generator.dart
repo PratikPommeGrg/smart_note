@@ -18,7 +18,11 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const VoiceRecordScreen());
 
       case RouteConfig.addNoteScreen:
-        return MaterialPageRoute(builder: (_) => const AddNoteScreen());
+        var args = settings.arguments as Map<String, dynamic>?;
+
+        return MaterialPageRoute(
+            builder: (_) =>
+                AddNoteScreen(isForEdit: args?['isForEdit'] ?? false));
 
       default:
         return MaterialPageRoute(builder: (_) => const RouteErrorScreen());

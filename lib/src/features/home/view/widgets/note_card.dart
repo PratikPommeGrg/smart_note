@@ -10,6 +10,7 @@ Widget noteCard(
     fit: StackFit.expand,
     children: [
       Card(
+        shape: const RoundedRectangleBorder(),
         elevation: 8,
         shadowColor: backgroundColor.withAlpha(160),
         color: backgroundColor,
@@ -78,7 +79,7 @@ Widget noteCard(
             height: 20,
             width: 20,
             colorFilter: const ColorFilter.mode(
-              Colors.redAccent,
+              AppColor.secondaryColor,
               BlendMode.srcIn,
             ),
           ),

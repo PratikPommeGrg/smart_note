@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_note/src/core/error/custom_exceptions.dart';
 import 'package:smart_note/src/providers/image_to_text_provider/image_to_text_provider.dart';
 
 //image index 0
@@ -31,13 +32,17 @@ class ImagePickerProvider {
           source: source == 1 ? ImageSource.gallery : ImageSource.camera,
         );
         if (image != null) {
-          ref
-              .read(imageToTextProvider.notifier)
-              .extractText(imagePath: image.path);
+          imageIndex == 1
+              ? ref
+                  .read(attachedImageProvider.notifier)
+                  .update((state) => List.from(state)..add(image))
+              : ref
+                  .read(imageToTextProvider.notifier)
+                  .extractText(imagePath: image.path);
         }
       }
     } catch (e) {
-      print("Error picking image: $e");
+      throw CustomExceptions(message: e.toString());
     }
   }
 

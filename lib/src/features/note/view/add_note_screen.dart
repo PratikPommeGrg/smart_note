@@ -9,21 +9,26 @@ import 'package:smart_note/src/core/app/dimensions.dart';
 import 'package:smart_note/src/core/app/texts.dart';
 import 'package:smart_note/src/core/enums/enums.dart';
 import 'package:smart_note/src/core/routing/route_navigation.dart';
+import 'package:smart_note/src/core/states/states.dart';
 import 'package:smart_note/src/features/note/models/note_options_model.dart';
 import 'package:smart_note/src/providers/image_provider/image_provider.dart';
 import 'package:smart_note/src/providers/image_to_text_provider/image_to_text_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
+import 'package:smart_note/src/providers/notes_provider/single_note_provider.dart';
 import 'package:smart_note/src/widgets/custom_dialogs.dart';
 import 'package:smart_note/src/widgets/custom_snackbar.dart';
 import 'package:smart_note/src/widgets/custom_text.dart';
 import 'package:smart_note/src/widgets/custom_text_form_field_widget.dart';
 
 class AddNoteScreen extends ConsumerWidget {
-  const AddNoteScreen({super.key});
+  const AddNoteScreen({super.key, this.isForEdit = false});
+
+  final bool? isForEdit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final attachedImagesProviderService = ref.watch(attachedImageProvider);
+
     bool isSaving = false;
 
     ref.listen(imageToTextProvider, (previous, next) {
@@ -66,6 +71,30 @@ class AddNoteScreen extends ConsumerWidget {
       }
     });
 
+    ref.listen(
+      singleNoteProvider,
+      (previous, next) {
+        if (next.status == SingleNoteProviderStatus.editNoteLoading) {
+          CustomDialogs.fullLoadingDialog(context: context);
+        }
+        if (next.status == SingleNoteProviderStatus.editNoteFailure) {
+          back(context);
+          CustomSnackbar.showSnackBar(
+              context: context, message: next.message ?? '');
+        }
+        if (next.status == SingleNoteProviderStatus.editNoteSuccess) {
+          back(context);
+          back(context);
+          ref.read(notesProvider.notifier).getNotes(
+                getByCategory: (selectedCategory.value != "All"),
+                showLoadingIndicator: false,
+              );
+          CustomSnackbar.showSnackBar(
+              context: context, message: next.message ?? '');
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -89,7 +118,9 @@ class AddNoteScreen extends ConsumerWidget {
                       warningSnackBar: true,
                     );
                   } else {
-                    await ref.read(notesProvider.notifier).addNote();
+                    isForEdit ?? false
+                        ? await ref.read(singleNoteProvider.notifier).editNote()
+                        : await ref.read(notesProvider.notifier).addNote();
                   }
                   isSaving = false;
                 }
@@ -102,7 +133,7 @@ class AddNoteScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomText.ourText(
-                  "Save",
+                  isForEdit ?? false ? "Save" : "Add",
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColor.kWhite,

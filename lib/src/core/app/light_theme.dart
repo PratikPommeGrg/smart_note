@@ -11,7 +11,7 @@ final appTheme = ThemeData(
       foregroundColor: AppColor.kNeutral800,
       backgroundColor: Colors.transparent,
       systemOverlayStyle: const SystemUiOverlayStyle(
-        // statusBarColor: AppColor.backgroundColor,
+        statusBarColor: Colors.transparent,
         statusBarBrightness: Brightness.light,
         statusBarIconBrightness: Brightness.dark,
       ),

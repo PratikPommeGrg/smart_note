@@ -87,6 +87,16 @@ $columnCardSize DOUBLE NOT NULL
     return result.map((e) => NoteModel.fromMap(e)).toList();
   }
 
+  Future<NoteModel?> getNoteById(int id) async {
+    await openMyDatabase;
+    final List<Map<String, Object?>> result = await _database!.query(
+      tableName,
+      where: '$columnId = ?',
+      whereArgs: [id],
+    );
+    return result.firstOrNull != null ? NoteModel.fromMap(result.first) : null;
+  }
+
   Future<void> closeDatabase() async {
     if (_database != null) {
       await _database!.close();

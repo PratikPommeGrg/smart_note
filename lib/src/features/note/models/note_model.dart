@@ -5,6 +5,7 @@ class NoteModel {
   final String category;
   final List<String>? images;
   final double? cardSize;
+  final bool? isForEdit;
 
   const NoteModel({
     this.id,
@@ -13,6 +14,7 @@ class NoteModel {
     required this.category,
     this.images,
     this.cardSize,
+    this.isForEdit = false,
   });
 
   NoteModel.fromMap(Map<String, dynamic> map)
@@ -23,7 +25,8 @@ class NoteModel {
         images = map['images'] != null
             ? List.from(map['images'].split('--,--'))
             : null,
-        cardSize = map['cardSize'];
+        cardSize = map['cardSize'],
+        isForEdit = false;
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
@@ -32,6 +35,9 @@ class NoteModel {
       'category': category,
       'cardSize': cardSize
     };
+    if (isForEdit == true) {
+      map['id'] = id;
+    }
 
     if (images != null) {
       map['images'] = images!.join('--,--');

@@ -19,6 +19,7 @@ enum NotesStateStatus {
   addNoteLoading,
   addNoteSuccess,
   addNoteFailure,
+
 }
 
 class NotesProvideState {
@@ -27,11 +28,13 @@ class NotesProvideState {
   final List<NoteModel> notes;
   final bool? showLoadingIndicator;
 
+
   NotesProvideState({
     this.message,
     this.status = NotesStateStatus.initial,
     this.notes = const [],
     this.showLoadingIndicator,
+
   });
 
 //get
@@ -78,7 +81,9 @@ class NotesProvideState {
         message: "Adding note, please wait...",
         status: NotesStateStatus.addNoteLoading,
       );
-  factory NotesProvideState.addNoteSuccess({String? message}) =>
+  factory NotesProvideState.addNoteSuccess({
+    String? message,
+  }) =>
       NotesProvideState(
         message: "Note Added Successfully",
         status: NotesStateStatus.addNoteSuccess,
@@ -88,6 +93,7 @@ class NotesProvideState {
         message: "Failed to Add Note",
         status: NotesStateStatus.addNoteFailure,
       );
+
 }
 
 class NotesProvider extends StateNotifier<NotesProvideState> {
@@ -169,6 +175,8 @@ class NotesProvider extends StateNotifier<NotesProvideState> {
       state = NotesProvideState.addNoteFailure();
     }
   }
+
+
 }
 
 final notesProvider = StateNotifierProvider<NotesProvider, NotesProvideState>(
