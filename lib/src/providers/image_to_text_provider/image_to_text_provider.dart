@@ -41,7 +41,8 @@ class ImageToTextNotifier extends StateNotifier<ImageToTextState> {
           await textRecognizer.processImage(InputImage.fromFilePath(imagePath));
       await textRecognizer.close();
 
-      String text = recognizedText.text.replaceAll(RegExp(r'\s+'), ' ');
+      // String text = recognizedText.text.replaceAll(RegExp(r'\s+'), ' ');
+      String text = recognizedText.text;
 
       state = ImageToTextState.success(
           message: "Text Extracted", extractedText: text);

@@ -32,7 +32,7 @@ Widget noteCard(
                     ? 3
                     : note.cardSize == 1
                         ? 5
-                        : 7,
+                        : 5,
               ),
             ],
           ),

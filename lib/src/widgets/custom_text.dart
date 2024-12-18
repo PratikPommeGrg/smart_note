@@ -16,11 +16,13 @@ class CustomText {
     Color? decorationColor,
     bool? isFontFamily = true,
     double? height,
+    bool? clipOverflow = false,
   }) =>
       Text(
         data ?? '',
         maxLines: maxLines,
-        overflow: TextOverflow.ellipsis,
+        overflow:
+            clipOverflow ?? false ? TextOverflow.clip : TextOverflow.ellipsis,
         textAlign: textAlign,
         style: TextStyle(
           height: height,

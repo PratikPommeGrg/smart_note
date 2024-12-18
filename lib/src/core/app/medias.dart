@@ -20,6 +20,7 @@ final kPinSvg = _getSvgBasePath('pin.svg');
 
 //jsons
 final kVoiceRecordActiveJson = _getJsonBasePath('voice_record_active.json');
+final kVoicePlayJson = _getJsonBasePath('voice_play.json');
 
 //network image
 // final kOnboardingUrl = _getNetworkImageBasePath('onboarding.png');

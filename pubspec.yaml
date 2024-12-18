@@ -44,6 +44,9 @@ dependencies:
   flutter_riverpod: ^2.6.1
   google_mlkit_text_recognition: ^0.14.0
   sqflite: ^2.4.1
+  flutter_dotenv: ^5.2.1
+  just_audio: ^0.9.42
+  http: ^1.2.2
 
 
 dev_dependencies:
@@ -73,6 +76,7 @@ flutter:
     - assets/json/
     - assets/images/
     - assets/svg/
+    - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

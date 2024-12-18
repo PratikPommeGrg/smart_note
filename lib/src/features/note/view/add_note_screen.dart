@@ -4,8 +4,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 import 'package:smart_note/src/core/app/colors.dart';
 import 'package:smart_note/src/core/app/dimensions.dart';
+import 'package:smart_note/src/core/app/medias.dart';
 import 'package:smart_note/src/core/app/texts.dart';
 import 'package:smart_note/src/core/enums/enums.dart';
 import 'package:smart_note/src/core/routing/route_navigation.dart';
@@ -15,6 +17,7 @@ import 'package:smart_note/src/providers/image_provider/image_provider.dart';
 import 'package:smart_note/src/providers/image_to_text_provider/image_to_text_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/single_note_provider.dart';
+import 'package:smart_note/src/providers/text_to_speech_provider/text_to_speech_provider.dart';
 import 'package:smart_note/src/widgets/custom_dialogs.dart';
 import 'package:smart_note/src/widgets/custom_snackbar.dart';
 import 'package:smart_note/src/widgets/custom_text.dart';
@@ -28,6 +31,7 @@ class AddNoteScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final attachedImagesProviderService = ref.watch(attachedImageProvider);
+    final textToImageProviderService = ref.watch(textToSpeechProvider);
 
     bool isSaving = false;
 
@@ -89,6 +93,16 @@ class AddNoteScreen extends ConsumerWidget {
                 getByCategory: (selectedCategory.value != "All"),
                 showLoadingIndicator: false,
               );
+          CustomSnackbar.showSnackBar(
+              context: context, message: next.message ?? '');
+        }
+      },
+    );
+
+    ref.listen(
+      textToSpeechProvider,
+      (previous, next) {
+        if (next.status == TextToSpeechStatus.failure) {
           CustomSnackbar.showSnackBar(
               context: context, message: next.message ?? '');
         }
@@ -314,6 +328,63 @@ class AddNoteScreen extends ConsumerWidget {
                         },
                       ),
                     ],
+                    vSizedBox1andHalf,
+                    Container(
+                      height: 80,
+                      width: appWidth(context),
+                      decoration: BoxDecoration(
+                          color: AppColor.kBlueLighter,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all()),
+                      padding: screenLeftRightPadding,
+                      alignment: Alignment.center,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              ref
+                                  .read(textToSpeechProvider.notifier)
+                                  .textToSpeech(ref
+                                      .read(notesProvider.notifier)
+                                      .noteController
+                                      .text);
+                            },
+                            child: const Icon(
+                              Icons.play_arrow,
+                              size: 32,
+                            ),
+                          ),
+                          hSizedBox1,
+                          Expanded(
+                            child: textToImageProviderService.status ==
+                                    TextToSpeechStatus.success
+                                ? FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: LottieBuilder.asset(
+                                      kVoicePlayJson,
+                                      fit: BoxFit.fitWidth,
+                                      alignment: Alignment.topCenter,
+                                    ),
+                                  )
+                                : textToImageProviderService.status ==
+                                        TextToSpeechStatus.loading
+                                    ? CustomText.ourText(
+                                        "Loading.................................................................",
+                                        maxLines: 1,
+                                        clipOverflow: true,
+                                        fontWeight: FontWeight.w500,
+                                      )
+                                    : CustomText.ourText(
+                                        "Click to Play Note in Voice",
+                                        maxLines: 1,
+                                        clipOverflow: true,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                          ),
+                        ],
+                      ),
+                    ),
                     vSizedBox1andHalf,
                   ],
                 ),
