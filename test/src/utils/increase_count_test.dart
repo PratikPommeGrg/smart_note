@@ -6,13 +6,13 @@ void main() {
     "Value should be increased by 1",
     () {
 //arrange
-      int value = 0;
+      int value = 1;
 
 //act
       int result = increment(value);
 
 //assert
-      expect(result, 1);
+      expect(result, 2);
     },
   );
 }
