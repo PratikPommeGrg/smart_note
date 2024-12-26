@@ -126,10 +126,14 @@ class AddNoteScreen extends ConsumerWidget {
                     .currentState!
                     .validate()) {
                   if (ref.read(selectNoteCategoryProvider) == null) {
-                    CustomSnackbar.showSnackBar(
-                      context: context,
-                      message: "Please select a category!",
-                      warningSnackBar: true,
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (timeStamp) {
+                        CustomSnackbar.showSnackBar(
+                          context: context,
+                          message: "Please select a category!",
+                          warningSnackBar: true,
+                        );
+                      },
                     );
                   } else {
                     isForEdit ?? false

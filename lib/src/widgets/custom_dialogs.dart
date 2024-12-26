@@ -23,13 +23,13 @@ class CustomDialogs {
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: const Color(0xff141A31).withOpacity(0.3),
+      barrierColor: const Color(0xff141A31).withValues(alpha: 0.3),
       barrierLabel: data ?? "Loading...",
       pageBuilder: (context, anim1, anim2) {
         return PopScope(
           canPop: false,
           child: Scaffold(
-            backgroundColor: Colors.black.withOpacity(0.2),
+            backgroundColor: Colors.black.withValues(alpha: 0.3),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

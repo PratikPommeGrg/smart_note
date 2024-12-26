@@ -23,10 +23,10 @@ class SitesFab extends StatefulWidget {
 
 class _SitesState extends State<SitesFab> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<Color?> _buttonColor;
+  // late Animation<Color?> _buttonColor;
   late Animation<double> _animateIcon;
-  late Animation<double?> _translateButton;
-  final Curve _curve = Curves.easeOut;
+  // late Animation<double?> _translateButton;
+  // final Curve _curve = Curves.easeOut;
   final double _fabHeight = 44.0;
 
   @override
@@ -40,28 +40,28 @@ class _SitesState extends State<SitesFab> with SingleTickerProviderStateMixin {
 
     _animateIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
-    _buttonColor = ColorTween(
-      begin: AppColor.primaryColor,
-      end: AppColor.primaryColor,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(
-        0.00,
-        1.00,
-        curve: Curves.linear,
-      ),
-    ));
-    _translateButton = Tween<double>(
-      begin: _fabHeight,
-      end: -14.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Interval(
-        0.0,
-        0.75,
-        curve: _curve,
-      ),
-    ));
+    // _buttonColor = ColorTween(
+    //   begin: AppColor.primaryColor,
+    //   end: AppColor.primaryColor,
+    // ).animate(CurvedAnimation(
+    //   parent: _animationController,
+    //   curve: const Interval(
+    //     0.00,
+    //     1.00,
+    //     curve: Curves.linear,
+    //   ),
+    // ));
+    // _translateButton = Tween<double>(
+    //   begin: _fabHeight,
+    //   end: -14.0,
+    // ).animate(CurvedAnimation(
+    //   parent: _animationController,
+    //   curve: Interval(
+    //     0.0,
+    //     0.75,
+    //     curve: _curve,
+    //   ),
+    // ));
     super.initState();
   }
 
@@ -113,7 +113,7 @@ class _SitesState extends State<SitesFab> with SingleTickerProviderStateMixin {
             boxShadow: isScreenBlurred.value == true
                 ? [
                     BoxShadow(
-                      color: AppColor.kBlueMain.withOpacity(0.72),
+                      color: AppColor.kBlueMain.withValues(alpha: 0.72),
                       offset: const Offset(0, 4),
                       blurRadius: 12,
                       spreadRadius: -4,
@@ -167,7 +167,7 @@ class _SitesState extends State<SitesFab> with SingleTickerProviderStateMixin {
             boxShadow: isScreenBlurred.value == true
                 ? [
                     BoxShadow(
-                      color: AppColor.kBlueMain.withOpacity(0.72),
+                      color: AppColor.kBlueMain.withValues(alpha: 0.72),
                       offset: const Offset(0, 4),
                       blurRadius: 12,
                       spreadRadius: -4,
@@ -203,7 +203,7 @@ class _SitesState extends State<SitesFab> with SingleTickerProviderStateMixin {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColor.kNeutral100.withOpacity(0.1),
+              color: AppColor.kNeutral100.withValues(alpha: 0.1),
               offset: const Offset(0, 2),
               blurRadius: 8,
             ),
@@ -236,7 +236,7 @@ class _SitesState extends State<SitesFab> with SingleTickerProviderStateMixin {
     return ValueListenableBuilder(
       valueListenable: isScreenBlurred,
       builder: (context, isBlurred, child) => Container(
-        color: isBlurred ? AppColor.kWhite.withOpacity(0.6) : null,
+        color: isBlurred ? AppColor.kWhite.withValues(alpha: 0.6) : null,
         child: BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: isBlurred ? 20 : 0,

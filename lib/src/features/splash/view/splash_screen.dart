@@ -20,7 +20,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Future.delayed(const Duration(seconds: 2)).then(
       (_) {
+        if (mounted) {
+
         navigateOffAllNamed(context, RouteConfig.homeScreen);
+        }
       },
     );
   }
