@@ -19,6 +19,9 @@ jobs:
         with:
           channel: 'stable'
           flutter-version-file: .flutter_version
+      - name: Create .env file
+        run: |
+          echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
       - name: Check Flutter Version
         run: flutter --version
       - name: Get Dependencies
@@ -43,6 +46,9 @@ jobs:
         with:
           channel: 'stable'
           flutter-version-file: .flutter_version
+      - name: Create .env file
+        run: |
+          echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
       - name: Check Flutter Version
         run: flutter --version
       - name: Clean Project
@@ -67,6 +73,9 @@ jobs:
         with:
           channel: 'stable'
           flutter-version-file: .flutter_version
+      - name: Create .env file
+        run: |
+          echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
       - name: Check Flutter Version
         run: flutter --version
       - name: Clean Project

@@ -466,3 +466,4 @@ class AddNoteScreen extends ConsumerWidget {
     );
   }
 }
+
