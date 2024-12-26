@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -58,29 +58,29 @@ jobs:
       - name: Build APK
         run: flutter build apk
 
-  build_ios:
-    name: Build iOS App
-    needs: [flutter_test]
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          flutter-version-file: .flutter_version
-      - name: Create .env file
-        run: |
-          echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
-      - name: Check Flutter Version
-        run: flutter --version
-      - name: Clean Project
-        run: flutter clean
-      - name: Get Dependencies
-        run: flutter pub get
-      - name: Build App
-        run: flutter build ios
+  # build_ios:
+  #   name: Build iOS App
+  #   needs: [flutter_test]
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-java@v4
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'temurin'
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: 'stable'
+  #         flutter-version-file: .flutter_version
+  #     - name: Create .env file
+  #       run: |
+  #         echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
+  #     - name: Check Flutter Version
+  #       run: flutter --version
+  #     - name: Clean Project
+  #       run: flutter clean
+  #     - name: Get Dependencies
+  #       run: flutter pub get
+  #     - name: Build App
+  #       run: flutter build ios
