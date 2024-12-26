@@ -45,8 +45,9 @@ jobs:
           flutter-version-file: .flutter_version
       - name: Check Flutter Version
         run: flutter --version
-      - name: Clean and Get Dependencies
+      - name: Clean Project
         run: flutter clean
+      - name: Get Dependencies
         run: flutter pub get
       - name: Build APK
         run: flutter build apk
@@ -68,8 +69,9 @@ jobs:
           flutter-version-file: .flutter_version
       - name: Check Flutter Version
         run: flutter --version
-      - name: Clean and Get Dependencies
+      - name: Clean Project
         run: flutter clean
+      - name: Get Dependencies
         run: flutter pub get
       - name: Build App
         run: flutter build ios
