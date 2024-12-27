@@ -14,11 +14,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Extract Flutter Version from fvm
+        run: |
+          FLUTTER_VERSION=$(jq -r '.flutter' .fvmrc)
+          echo "flutter version is $FLUTTER_VERSION"
+          echo "FLUTTER_VERSION=$FLUTTER_VERSION" >> $GITHUB_ENV    
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version-file: .flutter_version
+          flutter-version: ${{ env.FLUTTER_VERSION }}
       - name: Create .env file
         run: |
           echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
@@ -41,11 +46,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Extract Flutter Version from fvm
+        run: |
+          FLUTTER_VERSION=$(jq -r '.flutter' .fvmrc)
+          echo "flutter version is $FLUTTER_VERSION"
+          echo "FLUTTER_VERSION=$FLUTTER_VERSION" >> $GITHUB_ENV    
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version-file: .flutter_version
+          flutter-version: ${{ env.FLUTTER_VERSION }}
       - name: Create .env file
         run: |
           echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
