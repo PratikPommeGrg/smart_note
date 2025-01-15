@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_note/src/core/app/colors.dart';
 import 'package:smart_note/src/core/app/dimensions.dart';
 import 'package:smart_note/src/core/app/medias.dart';
@@ -17,11 +18,14 @@ import 'package:smart_note/src/providers/image_provider/image_provider.dart';
 import 'package:smart_note/src/providers/image_to_text_provider/image_to_text_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/single_note_provider.dart';
+import 'package:smart_note/src/providers/speech_to_text_provider/speech_to_text_provider.dart';
 import 'package:smart_note/src/providers/text_to_speech_provider/text_to_speech_provider.dart';
 import 'package:smart_note/src/widgets/custom_dialogs.dart';
 import 'package:smart_note/src/widgets/custom_snackbar.dart';
 import 'package:smart_note/src/widgets/custom_text.dart';
 import 'package:smart_note/src/widgets/custom_text_form_field_widget.dart';
+
+import '../../../services/persmission_handler_service.dart';
 
 class AddNoteScreen extends ConsumerWidget {
   const AddNoteScreen({super.key, this.isForEdit = false});
@@ -108,6 +112,33 @@ class AddNoteScreen extends ConsumerWidget {
         }
       },
     );
+
+    int count = 0;
+
+    ref.listen(speechToTextProvider, (previous, next) {
+      if (next.status == SpeechToTextStatus.failure) {
+        CustomSnackbar.showSnackBar(
+            context: context, message: next.message ?? '');
+        back(context);
+      }
+      if (next.status == SpeechToTextStatus.success) {
+        print("success");
+        print(next.text);
+        back(context);
+        count++;
+        CustomDialogs.showExtractedTextDialog(
+          context: context,
+          extractedText: next.text,
+          textEditingController:
+              ref.read(notesProvider.notifier).noteController,
+        );
+        print("num of times in success listen :: $count");
+      }
+      if (next.status == SpeechToTextStatus.initial) {
+        back(context);
+        print("from initial :: ${next.text}");
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -332,63 +363,65 @@ class AddNoteScreen extends ConsumerWidget {
                         },
                       ),
                     ],
-                    vSizedBox1andHalf,
-                    Container(
-                      height: 80,
-                      width: appWidth(context),
-                      decoration: BoxDecoration(
-                          color: AppColor.kBlueLighter,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all()),
-                      padding: screenLeftRightPadding,
-                      alignment: Alignment.center,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              ref
-                                  .read(textToSpeechProvider.notifier)
-                                  .textToSpeech(ref
-                                      .read(notesProvider.notifier)
-                                      .noteController
-                                      .text);
-                            },
-                            child: const Icon(
-                              Icons.play_arrow,
-                              size: 32,
+                    if (isForEdit ?? false) ...[
+                      vSizedBox1andHalf,
+                      Container(
+                        height: 80,
+                        width: appWidth(context),
+                        decoration: BoxDecoration(
+                            color: AppColor.kBlueLighter,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all()),
+                        padding: screenLeftRightPadding,
+                        alignment: Alignment.center,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                ref
+                                    .read(textToSpeechProvider.notifier)
+                                    .textToSpeech(ref
+                                        .read(notesProvider.notifier)
+                                        .noteController
+                                        .text);
+                              },
+                              child: const Icon(
+                                Icons.play_arrow,
+                                size: 32,
+                              ),
                             ),
-                          ),
-                          hSizedBox1,
-                          Expanded(
-                            child: textToImageProviderService.status ==
-                                    TextToSpeechStatus.success
-                                ? FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: LottieBuilder.asset(
-                                      kVoicePlayJson,
+                            hSizedBox1,
+                            Expanded(
+                              child: textToImageProviderService.status ==
+                                      TextToSpeechStatus.success
+                                  ? FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      alignment: Alignment.topCenter,
-                                    ),
-                                  )
-                                : textToImageProviderService.status ==
-                                        TextToSpeechStatus.loading
-                                    ? CustomText.ourText(
-                                        "Loading.................................................................",
-                                        maxLines: 1,
-                                        clipOverflow: true,
-                                        fontWeight: FontWeight.w500,
-                                      )
-                                    : CustomText.ourText(
-                                        "Click to Play Note in Voice",
-                                        maxLines: 1,
-                                        clipOverflow: true,
-                                        fontWeight: FontWeight.w500,
+                                      child: LottieBuilder.asset(
+                                        kVoicePlayJson,
+                                        fit: BoxFit.fitWidth,
+                                        alignment: Alignment.topCenter,
                                       ),
-                          ),
-                        ],
+                                    )
+                                  : textToImageProviderService.status ==
+                                          TextToSpeechStatus.loading
+                                      ? CustomText.ourText(
+                                          "Loading.................................................................",
+                                          maxLines: 1,
+                                          clipOverflow: true,
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      : CustomText.ourText(
+                                          "Click to Play Note in Voice",
+                                          maxLines: 1,
+                                          clipOverflow: true,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                     vSizedBox1andHalf,
                   ],
                 ),
@@ -411,9 +444,25 @@ class AddNoteScreen extends ConsumerWidget {
             children: noteOptions
                 .map(
                   (e) => InkWell(
-                    onTap: () {
+                    onTap: () async {
                       if (e.title.toLowerCase() == "voice") {
-                        CustomDialogs.showVoiceRecordDialog(context: context);
+                        bool micPermissionGranted =
+                            await PermissionHandlerService
+                                .getMicrophonePermission();
+
+                        if (micPermissionGranted) {
+                          CustomDialogs.showVoiceRecordDialog(
+                              context: context, ref: ref);
+
+                          final micPermission =
+                              await Permission.microphone.request();
+                          print("Permission :: $micPermission");
+                        } else {
+                          CustomSnackbar.showSnackBar(
+                              context: context,
+                              message: "Please allow access to microphone",
+                              isSuccess: false);
+                        }
                       }
                       if (e.title.toLowerCase() == "scan") {
                         CustomDialogs.imageBottomSheet(
@@ -466,4 +515,3 @@ class AddNoteScreen extends ConsumerWidget {
     );
   }
 }
-
