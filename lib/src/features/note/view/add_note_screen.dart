@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_note/src/core/app/colors.dart';
 import 'package:smart_note/src/core/app/dimensions.dart';
 import 'package:smart_note/src/core/app/medias.dart';
@@ -25,15 +24,18 @@ import 'package:smart_note/src/widgets/custom_snackbar.dart';
 import 'package:smart_note/src/widgets/custom_text.dart';
 import 'package:smart_note/src/widgets/custom_text_form_field_widget.dart';
 
-import '../../../services/persmission_handler_service.dart';
-
-class AddNoteScreen extends ConsumerWidget {
+class AddNoteScreen extends ConsumerStatefulWidget {
   const AddNoteScreen({super.key, this.isForEdit = false});
 
   final bool? isForEdit;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AddNoteScreen> createState() => _AddNoteScreenState();
+}
+
+class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
+  @override
+  Widget build(BuildContext context) {
     final attachedImagesProviderService = ref.watch(attachedImageProvider);
     final textToImageProviderService = ref.watch(textToSpeechProvider);
 
@@ -167,7 +169,7 @@ class AddNoteScreen extends ConsumerWidget {
                       },
                     );
                   } else {
-                    isForEdit ?? false
+                    widget.isForEdit ?? false
                         ? await ref.read(singleNoteProvider.notifier).editNote()
                         : await ref.read(notesProvider.notifier).addNote();
                   }
@@ -182,7 +184,7 @@ class AddNoteScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomText.ourText(
-                  isForEdit ?? false ? "Save" : "Add",
+                  widget.isForEdit ?? false ? "Save" : "Add",
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColor.kWhite,
@@ -363,7 +365,7 @@ class AddNoteScreen extends ConsumerWidget {
                         },
                       ),
                     ],
-                    if (isForEdit ?? false) ...[
+                    if (widget.isForEdit ?? false) ...[
                       vSizedBox1andHalf,
                       Container(
                         height: 80,
@@ -445,25 +447,6 @@ class AddNoteScreen extends ConsumerWidget {
                 .map(
                   (e) => InkWell(
                     onTap: () async {
-                      if (e.title.toLowerCase() == "voice") {
-                        bool micPermissionGranted =
-                            await PermissionHandlerService
-                                .getMicrophonePermission();
-
-                        if (micPermissionGranted) {
-                          CustomDialogs.showVoiceRecordDialog(
-                              context: context, ref: ref);
-
-                          final micPermission =
-                              await Permission.microphone.request();
-                          print("Permission :: $micPermission");
-                        } else {
-                          CustomSnackbar.showSnackBar(
-                              context: context,
-                              message: "Please allow access to microphone",
-                              isSuccess: false);
-                        }
-                      }
                       if (e.title.toLowerCase() == "scan") {
                         CustomDialogs.imageBottomSheet(
                           context: context,
@@ -477,6 +460,20 @@ class AddNoteScreen extends ConsumerWidget {
                           imageIndex: 1,
                           ref: ref,
                         );
+                      }
+                      if (e.title.toLowerCase() == "voice" && mounted) {
+                        // bool micPermissionGranted =
+                        //     await PermissionHandlerService
+                        //         .getMicrophonePermission();
+                        // if (micPermissionGranted) {
+                        //   CustomDialogs.showVoiceRecordDialog(
+                        //       context: context, ref: ref);
+                        // } else {
+                        //   CustomSnackbar.showSnackBar(
+                        //       context: context,
+                        //       message: "Please allow access to microphone",
+                        //       isSuccess: false);
+                        // }
                       }
                     },
                     child: Container(

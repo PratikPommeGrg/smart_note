@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:smart_note/src/services/speech-to-text.dart';
+import 'package:smart_note/src/services/speech_to_text.dart';
 
 final speechToTextProvider =
     StateNotifierProvider<SpeechToTextNotifier, SpeechToTextState>(
