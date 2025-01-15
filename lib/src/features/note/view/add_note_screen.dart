@@ -17,19 +17,25 @@ import 'package:smart_note/src/providers/image_provider/image_provider.dart';
 import 'package:smart_note/src/providers/image_to_text_provider/image_to_text_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/notes_provider.dart';
 import 'package:smart_note/src/providers/notes_provider/single_note_provider.dart';
+import 'package:smart_note/src/providers/speech_to_text_provider/speech_to_text_provider.dart';
 import 'package:smart_note/src/providers/text_to_speech_provider/text_to_speech_provider.dart';
 import 'package:smart_note/src/widgets/custom_dialogs.dart';
 import 'package:smart_note/src/widgets/custom_snackbar.dart';
 import 'package:smart_note/src/widgets/custom_text.dart';
 import 'package:smart_note/src/widgets/custom_text_form_field_widget.dart';
 
-class AddNoteScreen extends ConsumerWidget {
+class AddNoteScreen extends ConsumerStatefulWidget {
   const AddNoteScreen({super.key, this.isForEdit = false});
 
   final bool? isForEdit;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AddNoteScreen> createState() => _AddNoteScreenState();
+}
+
+class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
+  @override
+  Widget build(BuildContext context) {
     final attachedImagesProviderService = ref.watch(attachedImageProvider);
     final textToImageProviderService = ref.watch(textToSpeechProvider);
 
@@ -109,6 +115,33 @@ class AddNoteScreen extends ConsumerWidget {
       },
     );
 
+    int count = 0;
+
+    ref.listen(speechToTextProvider, (previous, next) {
+      if (next.status == SpeechToTextStatus.failure) {
+        CustomSnackbar.showSnackBar(
+            context: context, message: next.message ?? '');
+        back(context);
+      }
+      if (next.status == SpeechToTextStatus.success) {
+        print("success");
+        print(next.text);
+        back(context);
+        count++;
+        CustomDialogs.showExtractedTextDialog(
+          context: context,
+          extractedText: next.text,
+          textEditingController:
+              ref.read(notesProvider.notifier).noteController,
+        );
+        print("num of times in success listen :: $count");
+      }
+      if (next.status == SpeechToTextStatus.initial) {
+        back(context);
+        print("from initial :: ${next.text}");
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -136,7 +169,7 @@ class AddNoteScreen extends ConsumerWidget {
                       },
                     );
                   } else {
-                    isForEdit ?? false
+                    widget.isForEdit ?? false
                         ? await ref.read(singleNoteProvider.notifier).editNote()
                         : await ref.read(notesProvider.notifier).addNote();
                   }
@@ -151,7 +184,7 @@ class AddNoteScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomText.ourText(
-                  isForEdit ?? false ? "Save" : "Add",
+                  widget.isForEdit ?? false ? "Save" : "Add",
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColor.kWhite,
@@ -332,63 +365,65 @@ class AddNoteScreen extends ConsumerWidget {
                         },
                       ),
                     ],
-                    vSizedBox1andHalf,
-                    Container(
-                      height: 80,
-                      width: appWidth(context),
-                      decoration: BoxDecoration(
-                          color: AppColor.kBlueLighter,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all()),
-                      padding: screenLeftRightPadding,
-                      alignment: Alignment.center,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              ref
-                                  .read(textToSpeechProvider.notifier)
-                                  .textToSpeech(ref
-                                      .read(notesProvider.notifier)
-                                      .noteController
-                                      .text);
-                            },
-                            child: const Icon(
-                              Icons.play_arrow,
-                              size: 32,
+                    if (widget.isForEdit ?? false) ...[
+                      vSizedBox1andHalf,
+                      Container(
+                        height: 80,
+                        width: appWidth(context),
+                        decoration: BoxDecoration(
+                            color: AppColor.kBlueLighter,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all()),
+                        padding: screenLeftRightPadding,
+                        alignment: Alignment.center,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                ref
+                                    .read(textToSpeechProvider.notifier)
+                                    .textToSpeech(ref
+                                        .read(notesProvider.notifier)
+                                        .noteController
+                                        .text);
+                              },
+                              child: const Icon(
+                                Icons.play_arrow,
+                                size: 32,
+                              ),
                             ),
-                          ),
-                          hSizedBox1,
-                          Expanded(
-                            child: textToImageProviderService.status ==
-                                    TextToSpeechStatus.success
-                                ? FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: LottieBuilder.asset(
-                                      kVoicePlayJson,
+                            hSizedBox1,
+                            Expanded(
+                              child: textToImageProviderService.status ==
+                                      TextToSpeechStatus.success
+                                  ? FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      alignment: Alignment.topCenter,
-                                    ),
-                                  )
-                                : textToImageProviderService.status ==
-                                        TextToSpeechStatus.loading
-                                    ? CustomText.ourText(
-                                        "Loading.................................................................",
-                                        maxLines: 1,
-                                        clipOverflow: true,
-                                        fontWeight: FontWeight.w500,
-                                      )
-                                    : CustomText.ourText(
-                                        "Click to Play Note in Voice",
-                                        maxLines: 1,
-                                        clipOverflow: true,
-                                        fontWeight: FontWeight.w500,
+                                      child: LottieBuilder.asset(
+                                        kVoicePlayJson,
+                                        fit: BoxFit.fitWidth,
+                                        alignment: Alignment.topCenter,
                                       ),
-                          ),
-                        ],
+                                    )
+                                  : textToImageProviderService.status ==
+                                          TextToSpeechStatus.loading
+                                      ? CustomText.ourText(
+                                          "Loading.................................................................",
+                                          maxLines: 1,
+                                          clipOverflow: true,
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      : CustomText.ourText(
+                                          "Click to Play Note in Voice",
+                                          maxLines: 1,
+                                          clipOverflow: true,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                     vSizedBox1andHalf,
                   ],
                 ),
@@ -411,10 +446,7 @@ class AddNoteScreen extends ConsumerWidget {
             children: noteOptions
                 .map(
                   (e) => InkWell(
-                    onTap: () {
-                      if (e.title.toLowerCase() == "voice") {
-                        CustomDialogs.showVoiceRecordDialog(context: context);
-                      }
+                    onTap: () async {
                       if (e.title.toLowerCase() == "scan") {
                         CustomDialogs.imageBottomSheet(
                           context: context,
@@ -428,6 +460,20 @@ class AddNoteScreen extends ConsumerWidget {
                           imageIndex: 1,
                           ref: ref,
                         );
+                      }
+                      if (e.title.toLowerCase() == "voice" && mounted) {
+                        // bool micPermissionGranted =
+                        //     await PermissionHandlerService
+                        //         .getMicrophonePermission();
+                        // if (micPermissionGranted) {
+                        //   CustomDialogs.showVoiceRecordDialog(
+                        //       context: context, ref: ref);
+                        // } else {
+                        //   CustomSnackbar.showSnackBar(
+                        //       context: context,
+                        //       message: "Please allow access to microphone",
+                        //       isSuccess: false);
+                        // }
                       }
                     },
                     child: Container(
@@ -466,4 +512,3 @@ class AddNoteScreen extends ConsumerWidget {
     );
   }
 }
-

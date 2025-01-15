@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:smart_note/src/providers/image_provider/image_provider.dart';
+import 'package:smart_note/src/providers/speech_to_text_provider/speech_to_text_provider.dart';
 import 'package:smart_note/src/widgets/custom_button.dart';
 import 'package:smart_note/src/widgets/custom_network_image_widget.dart';
 
@@ -118,6 +119,7 @@ class CustomDialogs {
     required BuildContext context,
     bool? isLocal = false,
     String? imageUrl,
+    required WidgetRef ref,
   }) async {
     showDialog(
         context: context,
@@ -131,47 +133,59 @@ class CustomDialogs {
               //   vertical: 100,
               // ),
               backgroundColor: Colors.transparent,
-              child: ValueListenableBuilder(
-                valueListenable: isVoiceRecording,
-                builder: (context, value, child) => GestureDetector(
-                  onTap: () => isVoiceRecording.value = !isVoiceRecording.value,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (value) ...[
-                        CustomText.ourText(
-                          "Tap to Stop!",
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.kWhite,
-                          fontSize: 18,
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final isListening = ref.watch(speechToTextProvider.select(
+                    (value) => value.isListening,
+                  ));
+                  return GestureDetector(
+                    onTap: () {
+                      if (!isListening) {
+                        ref
+                            .read(speechToTextProvider.notifier)
+                            .startListening();
+                      } else {
+                        ref.read(speechToTextProvider.notifier).stopListening();
+                      }
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (isListening) ...[
+                          CustomText.ourText(
+                            "Tap to Stop!",
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.kWhite,
+                            fontSize: 18,
+                          ),
+                          vSizedBox1andHalf,
+                        ],
+                        AnimatedBuilder(
+                          animation: isVoiceRecording,
+                          builder: (context, child) => Center(
+                            child: isListening
+                                ? LottieBuilder.asset(
+                                    "assets/json/voice_record_active.json")
+                                : Image.asset(
+                                    "assets/images/voice_record_inactive.png",
+                                    height: appHeight(context) * 0.2,
+                                    colorBlendMode: BlendMode.srcIn,
+                                  ),
+                          ),
                         ),
                         vSizedBox1andHalf,
-                      ],
-                      AnimatedBuilder(
-                        animation: isVoiceRecording,
-                        builder: (context, child) => Center(
-                          child: value
-                              ? LottieBuilder.asset(
-                                  "assets/json/voice_record_active.json")
-                              : Image.asset(
-                                  "assets/images/voice_record_inactive.png",
-                                  height: appHeight(context) * 0.2,
-                                  colorBlendMode: BlendMode.srcIn,
-                                ),
+                        CustomText.ourText(
+                          isListening
+                              ? "After finishing recording you will be prompted to add note page"
+                              : "",
+                          textAlign: TextAlign.center,
+                          fontSize: 16,
+                          color: AppColor.kWhite,
                         ),
-                      ),
-                      vSizedBox1andHalf,
-                      CustomText.ourText(
-                        value
-                            ? "After finishing recording you will be prompted to add note page"
-                            : "",
-                        textAlign: TextAlign.center,
-                        fontSize: 16,
-                        color: AppColor.kWhite,
-                      ),
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           );
