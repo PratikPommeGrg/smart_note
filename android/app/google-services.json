@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "642219041851",
+    "project_id": "crashlytics-test-8f91e",
+    "storage_bucket": "crashlytics-test-8f91e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642219041851:android:e1f8a56ae1dd6ca525e81e",
+        "android_client_info": {
+          "package_name": "com.example.smart_note"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXUg31Bp5GsSzpFN10C45iKgLzXnwXHIk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
