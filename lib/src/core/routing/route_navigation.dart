@@ -73,18 +73,18 @@ navigateOffNamed(BuildContext context, String routeName,
   );
 }
 
-void navigateAsync(BuildContext context, Widget Function() pageBuilder,
-    {bool isFullDialog = false}) {
-  Future<void>.delayed(
-    Duration.zero,
-    () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => pageBuilder(),
-          fullscreenDialog: isFullDialog,
-        ),
-      );
-    },
-  );
-}
+// void navigateAsync(BuildContext context, Widget Function() pageBuilder,
+//     {bool isFullDialog = false}) {
+//   Future<void>.delayed(
+//     Duration.zero,
+//     () {
+//       Navigator.push(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => pageBuilder(),
+//           fullscreenDialog: isFullDialog,
+//         ),
+//       );
+//     },
+//   );
+// }

@@ -17,6 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+<<<<<<< HEAD
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         Future.delayed(const Duration(seconds: 2)).then(
@@ -24,6 +25,15 @@ class _SplashScreenState extends State<SplashScreen> {
             navigateOffAllNamed(context, RouteConfig.homeScreen);
           },
         );
+=======
+
+    Future.delayed(const Duration(seconds: 2)).then(
+      (_) {
+        if (mounted) {
+
+        navigateOffAllNamed(context, RouteConfig.homeScreen);
+        }
+>>>>>>> 136992c4643f7b09759c1a13b1bea0a6f60f7049
       },
     );
   }

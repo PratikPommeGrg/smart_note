@@ -1,0 +1,79 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  flutter_test:
+    name: Run Flutter Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Extract Flutter Version from fvm
+        run: |
+          FLUTTER_VERSION=$(jq -r '.flutter' .fvmrc)
+          echo "flutter version is $FLUTTER_VERSION"
+          echo "FLUTTER_VERSION=$FLUTTER_VERSION" >> $GITHUB_ENV    
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      - name: Create .env file
+        run: |
+          echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
+      - name: Check Flutter Version
+        run: flutter --version
+      - name: Get Dependencies
+        run: flutter pub get
+      - name: Analyze Code
+        run: flutter analyze
+      - name: Run Tests
+        run: flutter test
+
+      #builld apk and upload in firebase app distribution
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload and Distribute App
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          file: build/app/outputs/flutter-apk/app-release.apk
+          groups: 'testers'  
+
+
+
+
+  # build_ios:
+  #   name: Build iOS App
+  #   needs: [flutter_test]
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-java@v4
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'temurin'
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: 'stable'
+  #         flutter-version-file: .flutter_version
+  #     - name: Create .env file
+  #       run: |
+  #         echo "EL_API_KEY=${{ secrets.EL_API_KEY}}" >> .env
+  #     - name: Check Flutter Version
+  #       run: flutter --version
+  #     - name: Clean Project
+  #       run: flutter clean
+  #     - name: Get Dependencies
+  #       run: flutter pub get
+  #     - name: Build App
+  #       run: flutter build ios
