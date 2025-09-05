@@ -1,0 +1,2 @@
+/Users/bigbrain/Projects/my_projects/smart_note/android/app/.cxx/Debug/1i30555z/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/bigbrain/Projects/my_projects/smart_note/android/app/.cxx/Debug/1i30555z/armeabi-v7a/CMakeFiles/rebuild_cache.dir

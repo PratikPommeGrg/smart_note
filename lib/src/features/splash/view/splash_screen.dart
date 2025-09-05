@@ -17,10 +17,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(const Duration(seconds: 2)).then(
-      (_) {
-        navigateOffAllNamed(context, RouteConfig.homeScreen);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        Future.delayed(const Duration(seconds: 2)).then(
+          (_) {
+            navigateOffAllNamed(context, RouteConfig.homeScreen);
+          },
+        );
       },
     );
   }

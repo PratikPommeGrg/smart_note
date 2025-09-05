@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/bigbrain/fvm/versions/3.29.2/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/bigbrain/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/bigbrain/Projects/my_projects/smart_note/android/app/.cxx/Debug/1i30555z/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/bigbrain/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/bigbrain/Projects/my_projects/smart_note/android/app/.cxx/Debug/1i30555z/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
