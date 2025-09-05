@@ -48,3 +48,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+/ios/Flutter/Debug.xcconfig
+/ios/Flutter/Release.xcconfig
