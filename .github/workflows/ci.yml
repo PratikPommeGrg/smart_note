@@ -76,4 +76,4 @@ jobs:
   #     - name: Get Dependencies
   #       run: flutter pub get
   #     - name: Build App
-  #       run: flutter build ios
+  #       run: flutter build io
